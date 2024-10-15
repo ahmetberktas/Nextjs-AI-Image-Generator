@@ -1,5 +1,10 @@
 import HomePageContainer from "@/containers/home";
+import { HomePageProvider } from "@/containers/home/useHomepage";
 
 export default function Home() {
-  return <HomePageContainer />;
+  return (
+    <HomePageProvider>
+      <HomePageContainer />
+    </HomePageProvider>
+  );
 }

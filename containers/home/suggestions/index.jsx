@@ -1,10 +1,14 @@
+"use client";
 import styles from "./styles.module.css";
 
 import { SUGGESTIONS } from "./constants";
 
 import Tag from "@/components/tag";
 
+import { useHomePage } from "../useHomepage";
+
 function Suggestions() {
+  const { changeText } = useHomePage();
   return (
     <div className={styles.promptSuggestions}>
       <h3 className={styles.title}>
@@ -12,7 +16,11 @@ function Suggestions() {
       </h3>
       <div className={styles.suggestions}>
         {SUGGESTIONS.map((suggestion) => (
-          <Tag title={suggestion.title} key={suggestion.id} />
+          <Tag
+            onClick={changeText}
+            title={suggestion.title}
+            key={suggestion.id}
+          />
         ))}
       </div>
     </div>
