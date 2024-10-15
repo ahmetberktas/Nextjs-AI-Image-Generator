@@ -6,8 +6,18 @@ const HomePageContext = createContext();
 export const HomePageProvider = ({ children }) => {
   const [text, setText] = useState("");
 
-  const generateImage = () => {
-    /* Api Call */
+  const generateImage = async () => {
+    try {
+      await fetch(`/api/generate`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ text }),
+      });
+    } catch (err) {
+      throw new Error("Failed to generate");
+    }
   };
 
   const changeText = (newText) => {
