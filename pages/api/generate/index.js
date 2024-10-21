@@ -1,50 +1,39 @@
-const REPLICATE_MODEL_VERSION =
-  "5c7d5dc6dd8bf75c1acaa8565735e7986bc5b66206b55cca93cb72c9bf15ccaa";
-
-const startGeneration = async (text) => {
-  const res = await fetch(`${process.env.REPLICATE_API_URL}/predictions`, {
-    headers: {
-      Authorization: `Bearer ${process.env.REPLICATE_API_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    method: "POST",
-    body: JSON.stringify({
-      version: REPLICATE_MODEL_VERSION,
-      input: { text },
-    }),
-  });
-  return res.json();
+const headers = {
+  "x-rapidapi-key": process.env.OPENAI_API_KEY,
+  "x-rapidapi-host": "ai-text-to-image-generator-api.p.rapidapi.com",
+  "Content-Type": "application/json",
 };
 
-const getGeneration = async (url) => {
-  const result = await fetch(url, {
-    headers: {
-      Authorization: `Bearer ${process.env.REPLICATE_API_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-  });
-  return result.json();
+const startGeneration = async (text) => {
+  const options = {
+    method: "POST",
+    headers,
+    body: JSON.stringify({
+      inputs: text,
+    }),
+  };
+
+  const res = await fetch(process.env.OPENAI_API_URL, options);
+  return res.json();
 };
 
 export default async function handler(req, res) {
   const { text } = req.body;
+
   if (!text) {
-    res.status(400).json("No text provided");
+    return res.status(400).json("No text provided");
   }
 
-  const predictions = await startGeneration(text);
+  try {
+    const result = await startGeneration(text);
 
-  let generatedImage;
-
-  while (!generatedImage) {
-    const result = await getGeneration(predictions.urls.get);
-    if (result.status === "succeeded") {
-      [generatedImage] = result.output;
-    } else if (result.status === "failed") {
-      break;
+    if (result && result.url) {
+      return res.status(200).json({ imageUrl: result.url });
     } else {
-      await new Promise((resolve) => setTimeout(resolve, 2000));
+      return res.status(500).json("Failed to generate image");
     }
+  } catch (error) {
+    console.error("Error during image generation:", error);
+    return res.status(500).json("Error generating image");
   }
-  res.status(200).json(generatedImage ? generatedImage : "Failed");
 }

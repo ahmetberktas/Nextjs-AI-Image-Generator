@@ -5,17 +5,26 @@ const HomePageContext = createContext();
 
 export const HomePageProvider = ({ children }) => {
   const [text, setText] = useState("");
+  const [imageUrl, setImageUrl] = useState(null);
 
   const generateImage = async () => {
     try {
-      await fetch(`/api/generate`, {
+      const response = await fetch(`/api/generate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({ text }),
       });
+
+      if (!response.ok) {
+        throw new Error("Failed to generate");
+      }
+
+      const data = await response.json();
+      setImageUrl(data.imageUrl);
     } catch (err) {
+      console.error(err);
       throw new Error("Failed to generate");
     }
   };
@@ -31,8 +40,9 @@ export const HomePageProvider = ({ children }) => {
       setText,
       generateImage,
       changeText,
+      imageUrl,
     }),
-    [text]
+    [text, imageUrl]
   );
 
   return (
