@@ -6,9 +6,12 @@ const HomePageContext = createContext();
 export const HomePageProvider = ({ children }) => {
   const [text, setText] = useState("");
   const [imageUrl, setImageUrl] = useState(null);
+  const [error, setError] = useState(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const generateImage = async () => {
     try {
+      setIsSubmitting(true);
       const response = await fetch(`/api/generate`, {
         method: "POST",
         headers: {
@@ -23,10 +26,12 @@ export const HomePageProvider = ({ children }) => {
 
       const data = await response.json();
       setImageUrl(data.imageUrl);
+      setError(null);
     } catch (err) {
-      console.error(err);
+      setError(err);
       throw new Error("Failed to generate");
     }
+    setIsSubmitting(false);
   };
 
   const changeText = (newText) => {
@@ -41,8 +46,10 @@ export const HomePageProvider = ({ children }) => {
       generateImage,
       changeText,
       imageUrl,
+      error,
+      isSubmitting,
     }),
-    [text, imageUrl]
+    [text, imageUrl, error, isSubmitting]
   );
 
   return (
