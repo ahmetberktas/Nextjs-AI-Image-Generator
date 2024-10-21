@@ -9,7 +9,7 @@ import Loading from "@/components/loading";
 function ResultImage() {
   const { isSubmitting, error, imageUrl, text } = useHomePage();
 
-  if (error) return <p className={styles.error}>{error}</p>;
+  if (error) return <p className={styles.error}>{error.message}</p>;
   if (!isSubmitting && !imageUrl) return null;
   return (
     <div className={styles.resultImage}>

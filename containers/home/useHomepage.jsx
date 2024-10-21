@@ -21,7 +21,7 @@ export const HomePageProvider = ({ children }) => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to generate");
+        throw new Error(response.statusText || response.status);
       }
 
       const data = await response.json();
@@ -29,7 +29,6 @@ export const HomePageProvider = ({ children }) => {
       setError(null);
     } catch (err) {
       setError(err);
-      throw new Error("Failed to generate");
     }
     setIsSubmitting(false);
   };
